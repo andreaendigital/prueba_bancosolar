@@ -52,4 +52,10 @@ async function editar (id, datos){
     return result.rows[0]; // Devolver la canción actualizada
 }
 
-module.exports = {insertar, consultar, editar}; //exporto la función
+//funcion para eliminar un usuario por id recibido como un query.string
+async function eliminar (id) {
+    const result = await pool.query("DELETE FROM usuarios WHERE id = $1 RETURNING *", [id]);
+    return result.rows[0]; //devuelve el registro eliminado
+}
+
+module.exports = {insertar, consultar, editar, eliminar}; //exporto la función

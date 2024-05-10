@@ -28,14 +28,17 @@ app.listen(PORT_SERVER, () => {
 });
 
 // Importa la función insertar desde el módulo consultas.js
-const { insertar, consultar, editar } = require("./consultas/consultas.js");
+const { insertar, consultar, editar, eliminar } = require("./consultas/consultas.js");
 
-//ruta raíz donde levantamos el index.html:
+
+//-------------------------------------------------------------------------------------------
+//Ruta raíz donde levantamos el index.html:
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
   //cuando visite la raíz, devuelve el archivo con sendFile. __dirname le da la ruta
 });
 
+//-------------------------------------------------------------------------------------------
 //Ruta para agregar Usuarios a la lista:
 app.post("/usuario", async (req, res) => {
   try {
@@ -65,6 +68,8 @@ app.post("/usuario", async (req, res) => {
   }
 });
 
+
+//-------------------------------------------------------------------------------------------
 //Ruta para enlistar los usuarios
 app.get("/usuarios", async (req, res) => {
   try {
@@ -80,6 +85,7 @@ app.get("/usuarios", async (req, res) => {
   }
 });
 
+//-------------------------------------------------------------------------------------------
 //Ruta para editar un usuario
 app.put("/usuario", async (req, res) => {
   try {
@@ -108,6 +114,24 @@ app.put("/usuario", async (req, res) => {
     res.status(200).send(respuesta);
   } catch (error) {
     console.log("Error: ", error);
+    console.log("Error: ", error.message);
+    res.status(500).send(error);
+  }
+});
+
+
+//-------------------------------------------------------------------------------------------
+//Ruta para eliminar un usuario por id
+app.delete("/usuario", async (req, res) => {
+  try {
+    const { id } = req.query;
+    const resultado = await eliminar(id);
+    console.log("Respuesta de la funcion eliminar en el index: ", resultado);
+    res.json(resultado);
+    // res.status(200).send(registros);
+    //   res.status(200).json(registros);
+  } catch (error) {
+    // console.log("Error: ", error);
     console.log("Error: ", error.message);
     res.status(500).send(error);
   }
