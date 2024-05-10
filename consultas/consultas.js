@@ -118,8 +118,8 @@ async function transferir(datos) {
     if (transferencia.rowCount == 1) {
       console.log("Transferencia realizada con éxito: ", transferencia.rows[0]);
       await pool.query("COMMIT");
-      return "*** Transferencia completa y Exitosa ***";
-    // return transferencia.rows[0];
+    //   return "*** Transferencia completa y Exitosa ***";
+    return transferencia.rows[0];
     } else {
       console.log("*** Transaccion Incompleta, se aplico ROLLBACK ***");
       await pool.query("ROLLBACK");

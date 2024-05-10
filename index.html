@@ -256,7 +256,7 @@
         }),
       });
       // console.log("valor de response en transferencia: ", response);
-      // const data = await response.json();
+      const data = await response.json();
       // console.log("valor de data en transferencia: ", data);
       location.reload();
     } catch (e) {
@@ -321,6 +321,7 @@
       }
     }
     getUsuarios();
+    getTransferencias();
   };
   // getUsuarios();
   // };
