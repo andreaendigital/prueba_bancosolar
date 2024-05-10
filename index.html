@@ -67,7 +67,7 @@
                 />
               </div>
 
-              <button type="submit" class="btn btn-danger">Relalizar</button>
+              <button type="submit" class="btn btn-danger">Realizar</button>
             </div>
           </div>
         </form>
@@ -218,8 +218,8 @@
     try {
       const response = await fetch("http://localhost:3000/usuario", {
         method: "post",
-        headers:{
-          'Content-Type' : 'application/json'
+        headers: {
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           nombre,
@@ -246,17 +246,22 @@
     try {
       const response = await fetch("http://localhost:3000/transferencia", {
         method: "post",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           emisor,
           receptor,
           monto,
         }),
       });
-      const data = await response.json();
+      // console.log("valor de response en transferencia: ", response);
+      // const data = await response.json();
+      // console.log("valor de data en transferencia: ", data);
       location.reload();
     } catch (e) {
       console.log(e);
-      alert("Algo salió mal..." + e);
+      alert("Algo salió mal en la transferencia...");
     }
   });
 
@@ -283,17 +288,42 @@
               </tr>
          `);
 
-      $("#emisor").append(`<option value="${c.nombre}">${c.nombre}</option>`);
-      $("#receptor").append(`<option value="${c.nombre}">${c.nombre}</option>`);
+      $("#emisor").append(`<option value="${c.id}">${c.nombre}</option>`);
+      $("#receptor").append(`<option value="${c.id}">${c.nombre}</option>`);
     });
   };
 
   const eliminarUsuario = async (id) => {
-    const response = await fetch(`http://localhost:3000/usuario?id=${id}`, {
-      method: "DELETE",
-    });
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que quieres eliminar este usuario? Se eliminarán las transferencias relacionadas."
+    );
+
+    if (confirmacion) {
+      try {
+        const response = await fetch(`http://localhost:3000/usuario?id=${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          alert("Usuario y transferencias eliminadas correctamente.");
+          getUsuarios(); // Llamar a una función para actualizar la lista de usuarios después de eliminar uno
+        } else {
+          alert("Error al eliminar el usuario y las transferencias.");
+        }
+      } catch (error) {
+        console.error(
+          "Error al intentar eliminar el usuario y las transferencias:",
+          error
+        );
+        alert(
+          "Ocurrió un error al intentar eliminar el usuario y las transferencias."
+        );
+      }
+    }
     getUsuarios();
   };
+  // getUsuarios();
+  // };
 
   const getTransferencias = async () => {
     const { data } = await axios.get("http://localhost:3000/transferencias");
@@ -303,9 +333,9 @@
       $(".transferencias").append(`
        <tr>
          <td> ${formatDate(t[4])} </td>
-         <td> ${t[1]} </td>
-         <td> ${t[2]} </td>
-         <td> ${t[3]} </td>
+         <td> ${t.emisor} </td>
+         <td> ${t.receptor} </td>
+         <td> ${t.monto} </td>
        </tr>
      `);
     });

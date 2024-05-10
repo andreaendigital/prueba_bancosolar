@@ -28,7 +28,7 @@ app.listen(PORT_SERVER, () => {
 });
 
 // Importa la función insertar desde el módulo consultas.js
-const { insertar, consultar, editar, eliminar } = require("./consultas/consultas.js");
+const { insertar, consultar, editar, eliminar, transferir, listaTransferencias } = require("./consultas/consultas.js");
 
 
 //-------------------------------------------------------------------------------------------
@@ -42,10 +42,8 @@ app.get("/", (req, res) => {
 //Ruta para agregar Usuarios a la lista:
 app.post("/usuario", async (req, res) => {
   try {
-    console.log("estoy aqui dentro del try del router.post");
-    console.log("estoy aqui ", req.body);
-
-    const { nombre, balance } = req.body; // Extraer los campos 'titulo', 'artista' y 'tono' del cuerpo de la solicitud
+    // console.log("body que llega: ", req.body);
+    const { nombre, balance } = req.body; // Extraer los campos 'nombre' y 'balance' del cuerpo de la solicitud
     console.log("estoy aqui antes del if despues del destructuring");
     // Validar que los campos no estén vacíos
     if (nombre == "" || balance == "") {
@@ -130,6 +128,51 @@ app.delete("/usuario", async (req, res) => {
     res.json(resultado);
     // res.status(200).send(registros);
     //   res.status(200).json(registros);
+  } catch (error) {
+    // console.log("Error: ", error);
+    console.log("Error: ", error.message);
+    res.status(500).send(error);
+  }
+});
+
+//-------------------------------------------------------------------------------------------
+//Ruta para agregar Transferencia como transacción
+app.post("/transferencia", async (req, res) => {
+  try {
+    console.log("body que llega: ", req.body);
+
+    const { emisor, receptor, monto } = req.body; // Extraer los campos 'emisor', 'receptor, y 'monto' del cuerpo de la solicitud
+    
+    // Validar que los campos no estén vacíos
+    if (emisor == "" || receptor == "" || monto == "") {
+      console.log("Se necesita un monto para realizar la transacción.");
+      return res.status(400).json({
+        error: "Se necesita un monto para realizar la transacción.",
+      });
+    }
+    const datos = Object.values(req.body); //object.values extrae los valoes de todas las propiedades enumerables del objeto body y almacena esos valores en un array llamado datos
+    const resultadoTransferencia = await transferir(datos); // el resultado de la función insertar con argumento array datos, se almacena en respuesta
+    console.log(
+      "Valor devuelto por la funcion transferir de base de datos: ",
+      resultadoTransferencia
+    );
+    res.status(201).send(resultadoTransferencia);
+  } catch (error) {
+    // console.log("Error: ", error);
+    console.log("Error: ", error.message);
+    res.status(500).send(error);
+  }
+});
+
+//-------------------------------------------------------------------------------------------
+//Ruta para enlistar las transferencias
+app.get("/transferencias", async (req, res) => {
+  try {
+    const transferencias = await listaTransferencias();
+    console.log("Respuesta de la funcion listaTransferencias en el index: ", transferencias);
+    // res.json(transferencias);
+    // res.status(200).send(transferencias);
+    res.status(200).json(transferencias);
   } catch (error) {
     // console.log("Error: ", error);
     console.log("Error: ", error.message);
