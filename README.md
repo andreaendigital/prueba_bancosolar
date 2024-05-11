@@ -49,18 +49,44 @@ Lista de software y herramientas, incluyendo versiones, que necesitas para insta
 ## Visuales :mage_woman:
 
 - #### Front Entregado del proyecto :
+  
+![index](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/31617f34-6f97-4aa0-81ba-87c788f156e6)
 
 - #### Alertas para validación de campos vacíos en agregar usuario y en editar usurio:
+- 
+  ![verificacionCamposVaciosAlertAGregar](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/3674411c-713e-4b6d-8bf6-07990d22ceea)
   
+![verificacionCamposVaciosAlert](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/167aa2d8-b648-4cbb-a457-b92e0935e41f)
 
 - #### Avisos de procesos exitosos:
+![transferenciaExitosa](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/4ebaed91-b7c7-4333-b2b0-6b56f6bd75bb)
+
+![eliminarAlertConfirmacion](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/b52a4a09-387e-464a-b390-78a944fbaabb)
+
+![eliminarAlertExito](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/f40be2d6-fe24-4daa-94f1-4ce89e646d29)
 
 
 - #### Alerta para errores de consola:
+![errorBalanceNumeroAlert](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/e5bf8100-68d8-4db3-a66a-11f8ee0e2d4d)
+
+![errorCheckAlert](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/23d67ff5-7b35-42b6-a7fe-45a18e484dde)
 
 
-- #### Errores en consola:
+- #### En consola:
   
+  ![errorCheckTerminal](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/18ee6b09-8d27-4e38-bc22-025dc6b22d7b)
+
+  
+![errorBalanceNumeroTerminal](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/f1213f46-5f79-44d8-a96b-b0e47fc8e599)
+
+![transferenciaExitosaTerminal](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/57997f9f-9bde-4474-aac8-528302ba2df7)
+
+![listarTransferenciasTerminal](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/4ce9a263-d091-4477-bec3-6f16e31ce5d7)
+
+![eliminarTerminalBancoSolar](https://github.com/andreaendigital/prueba_bancosolar/assets/154395788/89bb1e45-efea-4bc3-9afc-8479a7f1a00b)
+
+
+
 
 ## Construido Con 🛠️
 
