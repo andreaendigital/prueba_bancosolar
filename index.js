@@ -44,7 +44,6 @@ app.post("/usuario", async (req, res) => {
   try {
     // console.log("body que llega: ", req.body);
     const { nombre, balance } = req.body; // Extraer los campos 'nombre' y 'balance' del cuerpo de la solicitud
-    console.log("estoy aqui antes del if despues del destructuring");
     // Validar que los campos no estén vacíos
     if (nombre == "" || balance == "") {
       console.log("Los campos 'nombre' y 'balance' son requeridos.");
