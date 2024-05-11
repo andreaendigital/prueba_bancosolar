@@ -1,5 +1,5 @@
 // // IMPORTANDO EL MANEJADOR DE ERRORES
-// import { getDatabaseError } from "../lib/errors/databaseError.js";
+const errors = require("../handleErrors/handleErrors.js");
 
 // importando paquetes instalados necesarios
 require("dotenv").config();
@@ -7,31 +7,48 @@ require("dotenv").config();
 // importando lo que necesitas de conection.js, conexion a la BD
 const { pool } = require("../database/conecction.js");
 
+//variables globales de index.js
+let status = "";
+let message = "";
+
 //-------------------------------------------------------------------------------------------
 // Funcion para insertar usuarios a la bd
 async function insertar(datos) {
-  //insertar recibe el array datos
-  console.log("Valores recibidos: ", datos);
-  const [nombre, balance] = datos; // Extraer datos del array datos
+  try {
+    //insertar recibe el array datos
+    console.log("Valores recibidos: ", datos);
+    const [nombre, balance] = datos; // Extraer datos del array datos
 
-  //contruyo el pool query y lo asigno a variable.
-  // - se invoca la variable pool y metodo query, dentro del query paso dos cosas
-  //las puedo pasar como objeto entonces abro {}
-  const result = await pool.query({
-    //construimos la instrucción y asignamos valores
-    text: "INSERT INTO usuarios (nombre, balance) VALUES ($1, $2) RETURNING *",
-    values: [nombre, balance],
-  });
-  //para saber lo que me responde la instrucción:
-  console.log("valor de result :", result);
-  //La función necesita devolver algo para entregarle a la ruta, necesita un return.
-  //Valor del result o del registro agregado:
-  console.log("Registro agregado row cero: ", result.rows[0]);
-  //Respuesta de la función:
-  return result.rows[0];
-  //resultado del camino feliz
-  //nos toca programar los caminos infelices, manejo de errores: parametros incompletos, parametros distinto tipo de dato, etc.
-  // return "Registro agregado con éxito"   //respuesta de prueba
+    //contruyo el pool query y lo asigno a variable.
+    const result = await pool.query({
+      //construimos la instrucción y asignamos valores
+      text: "INSERT INTO usuarios (nombre, balance) VALUES ($1, $2) RETURNING *",
+      values: [nombre, balance],
+    });
+    //para saber lo que me responde la instrucción:
+    //console.log("valor de result :", result);
+    //Respuesta de la función:
+    //   return result.rows[0];
+    if (result.rows != 0) {
+      //si el número de filas es distinto a cero, mostrar el mensaje:
+      console.log("Número de Usuarios agregados:", result.rowCount);
+      //Valor del result o del registro agregado:
+      console.log("Usuario Agregado ", result.rows[0]);
+      return result.rows[0];
+    } else {
+      //si hay 0 filas mostrar mensaje:
+      console.log("No se han agregado usuarios");
+      return "No se han agregado usuarios";
+    }
+  } catch (err) {
+    console.log("Error General: ", err);
+    const final = errors(err.code, message);
+    console.log("Codigo de Error: ", final.code);
+    console.log("Status de Error: ", final.status);
+    console.log("Mensaje de Error: ", final.message);
+    console.log("Error Original: ", err.message);
+    return final;
+  }
 }
 
 //-------------------------------------------------------------------------------------------
@@ -44,17 +61,28 @@ async function consultar() {
 //-------------------------------------------------------------------------------------------
 //Función para editar el balance de un usuario
 async function editar(id, datos) {
-  //editar recibe el array datos
-  console.log("Valores recibidos: ", datos);
-  const [name, balance] = datos; // Extraer datos del array datos
+  try {
+    //editar recibe el array datos
+    console.log("Valores recibidos: ", datos);
+    const [name, balance] = datos; // Extraer datos del array datos
 
-  const query = {
-    text: "UPDATE usuarios SET balance = $1 WHERE id = $2 RETURNING *",
-    values: [balance, id],
-  };
+    const query = {
+      text: "UPDATE usuarios SET balance = $1 WHERE id = $2 RETURNING *",
+      values: [balance, id],
+    };
 
-  const result = await pool.query(query);
-  return result.rows[0]; // Devolver la canción actualizada
+    const result = await pool.query(query);
+    return result.rows[0]; // Devolver el usuario actualizado
+
+  } catch (err) {
+    console.log("Error General: ", err);
+    const final = errors(err.code, message);
+    console.log("Codigo de Error: ", final.code);
+    console.log("Status de Error: ", final.status);
+    console.log("Mensaje de Error: ", final.message);
+    console.log("Error Original: ", err.message);
+    return final;
+  }
 }
 
 //-------------------------------------------------------------------------------------------
@@ -73,9 +101,9 @@ async function transferir(datos) {
   //insertar recibe el array datos
   console.log("Valores recibidos: ", datos);
   const [emisor, receptor, monto] = datos; // Extraer datos del array datos
-  console.log("Valor emisor: ", emisor);
-  console.log("Valor receptor: ", receptor);
-  console.log("Valor monto: ", monto);
+//   console.log("Valor emisor: ", emisor);
+//   console.log("Valor receptor: ", receptor);
+//   console.log("Valor monto: ", monto);
   try {
     // Inicia una transacción
     await pool.query("BEGIN"); // Comienza la transacción
@@ -108,38 +136,54 @@ async function transferir(datos) {
       await pool.query("ROLLBACK");
       return "*** Transaccion Incompleta, se aplico ROLLBACK ***";
     }
-   
+
     // Registra la transferencia en la tabla transferencias
     const transferencia = await pool.query(
       "INSERT INTO transferencias (emisor, receptor, monto, fecha) VALUES ($1, $2, $3, NOW()) RETURNING *",
       [emisor, receptor, monto]
     );
-    
+
     if (transferencia.rowCount == 1) {
       console.log("Transferencia realizada con éxito: ", transferencia.rows[0]);
       await pool.query("COMMIT");
-    //   return "*** Transferencia completa y Exitosa ***";
-    return transferencia.rows[0];
+      //   return "*** Transferencia completa y Exitosa ***";
+      return transferencia.rows[0];
     } else {
       console.log("*** Transaccion Incompleta, se aplico ROLLBACK ***");
       await pool.query("ROLLBACK");
       return "*** Transaccion Incompleta, se aplico ROLLBACK ***";
     }
-  } catch (e) {
+  } 
+  catch (err) {
     await pool.query("ROLLBACK");
-    console.log("Error conexión o instrucción, Transacción abortada");
-    return "*** Error en transaccion, aplicado ROLLBACK: " + e;
+
+    console.log("Error General: ", err);
+    const final = errors(err.code, message);
+    console.log("Codigo de Error: ", final.code);
+    console.log("Status de Error: ", final.status);
+    console.log("Mensaje de Error: ", final.message);
+    console.log("Error Original: ", err.message);
+    return final;
   }
 }
 
 //-------------------------------------------------------------------------------------------
 //Función para consultar la base de datos y enlistar la tabla transferencias
 async function listaTransferencias() {
-    // const result = await pool.query("SELECT * FROM transferencias");
-    const result = await pool.query("SELECT u.nombre AS emisor, r.nombre AS receptor, t.monto, t.fecha FROM transferencias t INNER JOIN usuarios u ON u.id = t.emisor INNER JOIN usuarios r ON r.id = t.receptor");
-    return result.rows;
-  }
+  // const result = await pool.query("SELECT * FROM transferencias");
+  const result = await pool.query(
+    "SELECT u.nombre AS emisor, r.nombre AS receptor, t.monto, t.fecha FROM transferencias t INNER JOIN usuarios u ON u.id = t.emisor INNER JOIN usuarios r ON r.id = t.receptor"
+  );
+  return result.rows;
+}
 
 //-------------------------------------------------------------------------------------------
 
-module.exports = { insertar, consultar, editar, eliminar, transferir, listaTransferencias }; //exporto la función
+module.exports = {
+  insertar,
+  consultar,
+  editar,
+  eliminar,
+  transferir,
+  listaTransferencias,
+}; //exporto la función

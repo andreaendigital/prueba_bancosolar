@@ -25,7 +25,7 @@
               Nombre:
               <input class="form-control d-inline mx-3" />
               Balance:
-              <input class="form-control d-inline mx-3"/>
+              <input class="form-control d-inline mx-3" />
               <button type="submit" class="btn btn-danger">Agregar</button>
             </div>
           </div>
@@ -204,12 +204,31 @@
           balance,
         }
       );
+      // Si la solicitud se completa con éxito, oculta el modal y recarga la página
       $("#exampleModal").modal("hide");
       location.reload();
-    } catch (e) {
-      alert("Algo salió mal..." + e);
+      
+      // Muestra la respuesta en un alert (en caso de éxito)
+       // Mostrar el mensaje del backend en un alert
+       if (data && data.message) {
+          alert(data.message);
+        } else {
+          alert("Usuario editado correctamente: " + data.message);
+        }
+    } catch (error) {
+    // Si ocurre un error, muestra el mensaje de error correspondiente
+    if (error.response) {
+      // Error de respuesta HTTP (por ejemplo, error 4xx/5xx)
+      alert("Error: " + error.response.data.error);
+    } else if (error.request) {
+      // Error de la solicitud (por ejemplo, no se pudo realizar la solicitud)
+      alert("Error de solicitud: No se pudo completar la solicitud");
+    } else {
+      // Otro tipo de error
+      alert("Error desconocido: " + error.message);
     }
-  };
+  }
+};
 
   $("form:first").submit(async (e) => {
     e.preventDefault();
@@ -226,11 +245,36 @@
           balance,
         }),
       });
-      $("form:first input:first").val("");
-      $("form:first input:nth-child(2)").val("");
-      location.reload();
-    } catch (e) {
-      alert("Algo salió mal ..." + e);
+      // console.log("response:" , response);
+      if (response.ok) {
+        const data = await response.json(); // Parsear la respuesta como JSON
+
+        // Limpiar los campos del formulario después de enviar la solicitud
+        $("form:first input:first").val("");
+        $("form:first input:nth-child(2)").val("");
+
+        // Mostrar el mensaje del backend en un alert
+        if (data && data.message) {
+          alert(data.message);
+        } else {
+          alert("¡Usuario creado correctamente!");
+        }
+        // Recargar la página después de una solicitud exitosa (si es necesario)
+        location.reload();
+      } else {
+        // La solicitud falló con un código de respuesta no exitoso
+        const errorData = await response.json(); // Parsear el error como JSON
+        if (errorData && errorData.error) {
+          // Mostrar mensaje de error y código de error en un alert
+          alert(`Error (${response.status}): ${errorData.error}`);
+        } else {
+          alert(
+            `Error (${response.status}): Ocurrió un error al procesar la solicitud.`
+          );
+        }
+      }
+    } catch (error) {
+      alert("Algo salió mal ..." + error);
     }
   });
 
@@ -247,7 +291,7 @@
       const response = await fetch("http://localhost:3000/transferencia", {
         method: "post",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           emisor,
@@ -255,12 +299,32 @@
           monto,
         }),
       });
+      if (response.ok) {
       // console.log("valor de response en transferencia: ", response);
       const data = await response.json();
       // console.log("valor de data en transferencia: ", data);
+       // Mostrar el mensaje del backend en un alert
+       if (data && data.message) {
+          alert(data.message);
+        } else {
+          alert("¡Transferencia realizada con éxito!");
+        }
       location.reload();
-    } catch (e) {
-      console.log(e);
+    } else {
+        // La solicitud falló con un código de respuesta no exitoso
+        const errorData = await response.json(); // Parsear el error como JSON
+        if (errorData && errorData.error) {
+          // Mostrar mensaje de error y código de error en un alert
+          alert(`Error (${response.status}): ${errorData.error}`);
+        } else {
+          alert(
+            `Error (${response.status}): Ocurrió un error al procesar la solicitud.`
+          );
+        }
+      }
+
+    } catch (error) {
+      console.log(error);
       alert("Algo salió mal en la transferencia...");
     }
   });

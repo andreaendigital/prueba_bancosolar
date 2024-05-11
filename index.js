@@ -28,8 +28,14 @@ app.listen(PORT_SERVER, () => {
 });
 
 // Importa la función insertar desde el módulo consultas.js
-const { insertar, consultar, editar, eliminar, transferir, listaTransferencias } = require("./consultas/consultas.js");
-
+const {
+  insertar,
+  consultar,
+  editar,
+  eliminar,
+  transferir,
+  listaTransferencias,
+} = require("./consultas/consultas.js");
 
 //-------------------------------------------------------------------------------------------
 //Ruta raíz donde levantamos el index.html:
@@ -42,29 +48,37 @@ app.get("/", (req, res) => {
 //Ruta para agregar Usuarios a la lista:
 app.post("/usuario", async (req, res) => {
   try {
-    // console.log("body que llega: ", req.body);
-    const { nombre, balance } = req.body; // Extraer los campos 'nombre' y 'balance' del cuerpo de la solicitud
-    // Validar que los campos no estén vacíos
+      // console.log("body que llega: ", req.body);
+      const { nombre, balance } = req.body; // Extraer los campos 'nombre' y 'balance' del cuerpo de la solicitud
+   
+     // Validar que el campo 'balance' sea un número
+     if (balance == null) {
+      console.log("El campo 'balance' debe ser un número.");
+      return res.status(400).json({
+        error: "El campo 'balance' debe ser un número.",
+      });
+    }
+   // Validar que los campos no estén vacíos
     if (nombre == "" || balance == "") {
       console.log("Los campos 'nombre' y 'balance' son requeridos.");
       return res.status(400).json({
         error: "Los campos 'nombre' y 'balance' son requeridos.",
       });
     }
+   
     const datos = Object.values(req.body); //object.values extrae los valoes de todas las propiedades enumerables del objeto body y almacena esos valores en un array llamado datos
     const respuesta = await insertar(datos); // el resultado de la función insertar con argumento array datos, se almacena en respuesta
     console.log(
       "Valor devuelto por la funcion insertar de base de datos: ",
       respuesta
     );
-    res.status(201).send("registro agregado exitosamente");
+    res.status(201).send(respuesta);
   } catch (error) {
     // console.log("Error: ", error);
     console.log("Error: ", error.message);
     res.status(500).send(error);
   }
 });
-
 
 //-------------------------------------------------------------------------------------------
 //Ruta para enlistar los usuarios
@@ -88,7 +102,7 @@ app.put("/usuario", async (req, res) => {
   try {
     const { id } = req.query; // Obtener el ID del usuario por query string
     const { name, balance } = req.body; // Extraer los campos 'name' y 'balance' del cuerpo de la solicitud
-    
+
     // console.log("id que llega" , id);
     // console.log("body", req.body);
 
@@ -98,8 +112,7 @@ app.put("/usuario", async (req, res) => {
         "Los campos 'nombre' y 'balance' son requeridos para editar."
       );
       return res.status(400).json({
-        error:
-        "Los campos 'nombre' y 'balance' son requeridos para editar."
+        error: "Los campos 'nombre' y 'balance' son requeridos para editar.",
       });
     }
     const datos = Object.values(req.body);
@@ -116,7 +129,6 @@ app.put("/usuario", async (req, res) => {
   }
 });
 
-
 //-------------------------------------------------------------------------------------------
 //Ruta para eliminar un usuario por id
 app.delete("/usuario", async (req, res) => {
@@ -128,7 +140,7 @@ app.delete("/usuario", async (req, res) => {
     // res.status(200).send(registros);
     //   res.status(200).json(registros);
   } catch (error) {
-    // console.log("Error: ", error);
+    console.log("Error: ", error);
     console.log("Error: ", error.message);
     res.status(500).send(error);
   }
@@ -141,7 +153,7 @@ app.post("/transferencia", async (req, res) => {
     console.log("body que llega: ", req.body);
 
     const { emisor, receptor, monto } = req.body; // Extraer los campos 'emisor', 'receptor, y 'monto' del cuerpo de la solicitud
-    
+
     // Validar que los campos no estén vacíos
     if (emisor == "" || receptor == "" || monto == "") {
       console.log("Se necesita un monto para realizar la transacción.");
@@ -168,7 +180,10 @@ app.post("/transferencia", async (req, res) => {
 app.get("/transferencias", async (req, res) => {
   try {
     const transferencias = await listaTransferencias();
-    console.log("Respuesta de la funcion listaTransferencias en el index: ", transferencias);
+    console.log(
+      "Respuesta de la funcion listaTransferencias en el index: ",
+      transferencias
+    );
     // res.json(transferencias);
     // res.status(200).send(transferencias);
     res.status(200).json(transferencias);
